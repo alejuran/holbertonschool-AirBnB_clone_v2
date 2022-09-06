@@ -9,6 +9,8 @@ from os import getenv
 
 
 HBNB_TYPE_STORAGE = getenv('HBNB_TYPE_STORAGE')
+
+
 class State(BaseModel, Base):
     """ State class """
     if HBNB_TYPE_STORAGE == 'db':
@@ -19,7 +21,7 @@ class State(BaseModel, Base):
     def init(self, *args, **kwargs):
         """initializes state"""
         super().__init__(*args, **kwargs)
-    
+
     if HBNB_TYPE_STORAGE != 'db':
         @property
         def cities(self):
@@ -27,4 +29,5 @@ class State(BaseModel, Base):
             with state_id equals to the current State.id"""
             from models import storage
             cities = storage.all(City)
-            return [city for city in cities.values() if city.state_id == self.id]
+            return [city for city in cities.values()
+                    if city.state_id == self.id]
