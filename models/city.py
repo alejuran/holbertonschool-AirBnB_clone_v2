@@ -9,7 +9,7 @@ from sqlalchemy.orm import relationship
 
 class City(BaseModel):
     """ The city class, contains state ID and name """
-    if models.storage_t == "db":
+    if HBNB_TYPE_STORAGE == "db":
         __tablename__ = 'cities'
         state_id = Column(String(60), ForeignKey('states.id'), nullable=False)
         name = Column(String(128), nullable=False)
@@ -18,6 +18,7 @@ class City(BaseModel):
         state_id = ""
         name = ""
 
-    def __init__(self, *args, **kwargs):
-        """Initialize city"""
-        super().__init__(*args, **kwargs)
+    if HBNB_TYPE_STORAGE == "db":
+        def __init__(self, *args, **kwargs):
+            """Initialize city"""
+            super().__init__(*args, **kwargs)

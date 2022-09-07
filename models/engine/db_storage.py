@@ -16,7 +16,8 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 class DBStorage:
     """"""
     classes = {"Amenity": Amenity, "City": City, "Place": Place,
-               "Review": Review, "State": State, "User": User, "BaseModel": BaseModel}
+               "Review": Review, "State": State, "User": User,
+               "BaseModel": BaseModel}
     __engine = None
     __session = None
 
@@ -28,8 +29,8 @@ class DBStorage:
         HBNB_MYSQL_DB = getenv('HBNB_MYSQL_DB')
         self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'
                                       .format(HBNB_MYSQL_USER, HBNB_MYSQL_PWD,
-                                                HBNB_MYSQL_HOST, HBNB_MYSQL_DB,
-                                        pool_pre_ping=True))
+                                              HBNB_MYSQL_HOST, HBNB_MYSQL_DB,
+                                      pool_pre_ping=True))
         if getenv('HBNB_ENV') == 'test':
             Base.metadata.drop_all(self.__engine)
 
@@ -43,7 +44,7 @@ class DBStorage:
                     key = instance.__class__.__name__ + '.' + instance.id
                     newdict[key] = instance
         return newdict
-        
+
     def new(self, obj):
         """add the object to the current database session"""
         self.__session.add(obj)
