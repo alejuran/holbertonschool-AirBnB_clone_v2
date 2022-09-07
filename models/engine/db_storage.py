@@ -15,8 +15,8 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 
 class DBStorage:
     """"""
-    classes = {"Amenity": Amenity, "City": City, "Place": Place,
-               "Review": Review, "State": State, "User": User,}
+    classes = {"City": City, "State": State, "User": User, "Place": Place,
+                "Review": Review, "Amenity": Amenity}
     __engine = None
     __session = None
 
@@ -29,7 +29,7 @@ class DBStorage:
         self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'
                                       .format(HBNB_MYSQL_USER, HBNB_MYSQL_PWD,
                                               HBNB_MYSQL_HOST, HBNB_MYSQL_DB,
-                                      pool_pre_ping=True))
+                                              pool_pre_ping=True))
         if getenv('HBNB_ENV') == 'test':
             Base.metadata.drop_all(self.__engine)
 
