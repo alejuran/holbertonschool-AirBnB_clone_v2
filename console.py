@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 """ Console Module """
 import cmd
-import shlex
 import sys
 from models.base_model import BaseModel
 from models.__init__ import storage
@@ -11,6 +10,10 @@ from models.state import State
 from models.city import City
 from models.amenity import Amenity
 from models.review import Review
+from os import getenv
+
+
+HBNB_TYPE_STORAGE = getenv('HBNB_TYPE_STORAGE')
 
 
 class HBNBCommand(cmd.Cmd):
@@ -18,12 +21,12 @@ class HBNBCommand(cmd.Cmd):
 
     # determines prompt for interactive/non-interactive modes
     prompt = '(hbnb) ' if sys.__stdin__.isatty() else ''
+
     classes = {
                'BaseModel': BaseModel, 'User': User, 'Place': Place,
                'State': State, 'City': City, 'Amenity': Amenity,
                'Review': Review
               }
-
     dot_cmds = ['all', 'count', 'show', 'destroy', 'update']
     types = {
              'number_rooms': int, 'number_bathrooms': int,
@@ -38,7 +41,6 @@ class HBNBCommand(cmd.Cmd):
 
     def precmd(self, line):
         """Reformat command line for advanced command syntax.
-
         Usage: <class name>.<command>([<id> [<*args> or <**kwargs>]])
         (Brackets denote optional fields in usage example.)
         """
@@ -114,38 +116,37 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def _key_value_parser(self, args, instance):
-        """creates a dictionary from a list of strings"""
-        for arg in args:
-            if "=" in arg:
-                key, value = arg.split('=')
-                if value[0] is value[-1] in ['"', "'"]:
-                    value = value.strip("\"'").replace('_', ' ')
-                else:
-                    try:
-                        value = int(value)
-                    except ValueError:
-                        try:
-                            value = float(value)
-                        except ValueError:
-                            continue
-                setattr(instance, key, value)
-
-    def do_create(self, arg):
-        """Creates a new instance of a class"""
-        args = arg.split(' ')
-        if len(args) == 0:
-            print("** class doesn't exists **")
-            return False
-        if args[0] in HBNBCommand.classes:
-            instance = HBNBCommand.classes[args[0]]()
-            self._key_value_parser(args[1:], instance)
+    def do_create(self, args):
+        """ Create an object of any class"""
+        if not args:
+            print("** class name missing **")
+            return
+        params = args.split(" ")
+        if params[0] not in HBNBCommand.classes:
+            print("** class doesn't exist **")
+            return
         else:
-            print("** class doesn't exist")
-            return False
+            new_instance = HBNBCommand.classes[params[0]]()
+            self.update_instance(params, new_instance)
+        storage.new(new_instance)
+        print(new_instance.id)
         storage.save()
-        print(instance.id)
-        storage.save()
+
+    def update_instance(self, args, instance):
+        """Transform a string in dictionary"""
+        for idx in range(1, len(args)):
+            key, value = args[idx].split('=')
+            if value[0] is value[-1] in ['"', "'"]:
+                value = value.strip("\"'").replace('_', ' ')
+            else:
+                try:
+                    value = int(value)
+                except ValueError:
+                    try:
+                        value = float(value)
+                    except ValueError:
+                        continue
+            setattr(instance, key, value)
 
     def help_create(self):
         """ Help information for the create method """
@@ -221,19 +222,26 @@ class HBNBCommand(cmd.Cmd):
     def do_all(self, args):
         """ Shows all objects, or all objects of a class"""
         print_list = []
-
         if args:
             args = args.split(' ')[0]  # remove possible trailing args
             if args not in HBNBCommand.classes:
                 print("** class doesn't exist **")
                 return
-            for k, v in storage._FileStorage__objects.items():
-                if k.split('.')[0] == args:
-                    print_list.append(str(v))
+            if HBNB_TYPE_STORAGE != 'db':
+                for k, v in storage._FileStorage__objects.items():
+                    if k.split('.')[0] == args:
+                        print_list.append(str(v))
+            else:
+                for k, v in storage.all().items():
+                    if k.split('.')[0] == args:
+                        print_list.append(str(v))
         else:
-            for k, v in storage._FileStorage__objects.items():
-                print_list.append(str(v))
-
+            if HBNB_TYPE_STORAGE != 'db':
+                for k, v in storage._FileStorage__objects.items():
+                    print_list.append(str(v))
+            else:
+                for k, v in storage.all().items():
+                    print_list.append(str(v))
         print(print_list)
 
     def help_all(self):
