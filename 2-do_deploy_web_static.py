@@ -9,7 +9,6 @@ from datetime import datetime
 import os
 
 
-env.user = 'ubuntu'
 env.hosts = ['50.19.155.99', '3.95.25.61']
 
 
