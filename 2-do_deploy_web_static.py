@@ -8,12 +8,13 @@ from fabric.api import *
 from datetime import datetime
 import os
 
-
 env.hosts = ['50.19.155.99', '3.95.25.61']
 
 
 def do_pack():
-    """generates a tgz archive"""
+    """return the archive path if the archive has been correctly generated.
+    Otherwise, it should return None
+    """
     local("mkdir -p versions")
     date = datetime.strftime(datetime.now(), '%Y%m%d%H%M%S')
     file = local("tar -cvzf versions/web_static_{}.tgz web_static"
@@ -24,21 +25,20 @@ def do_pack():
 
 
 def do_deploy(archive_path):
-    """
-    Returns False if the file at the
-    path archive_path doesn’t exist
+    """Returns True if all operations have been done correctly,
+    otherwise returns False
     """
     if not os.path.exists(archive_path):
         return False
     try:
         put(archive_path, "/tmp/")
-        file = archive_path.split('/')[-1]('.')[0]
+        file = archive_path.split('/')[-1].split('.')[0]
         sudo("mkdir -p /data/web_static/releases/{}/".format(file))
         sudo("tar -xzf /tmp/{}.tgz -C /data/web_static/releases/{}/"
              .format(file, file))
         sudo("rm /tmp/{}.tgz".format(file))
         sudo("mv /data/web_static/releases/{}/web_static/*\
-        /data/web_static/releases/{}".format(file, file))
+        /data/web_static/releases/{}/".format(file, file))
         sudo("rm -rf /data/web_static/releases/{}/web_static".format(file))
         sudo("rm -rf /data/web_static/current")
         sudo("ln -s /data/web_static/releases/{}/ /data/web_static/current"
