@@ -10,16 +10,16 @@ import tarfile
 env.hosts = ['50.19.155.99', '3.95.25.61']
 
 
-def do_clean(num=0):
+def do_clean(number=0):
     """ Removes all but given number of archives"""
-    num = int(num)
-    if num < 2:
-        num = 1
-    num += 1
-    num = str(num)
+    number = int(number)
+    if number < 2:
+        number = 1
+    number += 1
+    number = str(number)
     with lcd("versions"):
         local("ls -1t | grep web_static_.*\.tgz | tail -n +" +
-              num + " | xargs -I {} rm -- {}")
+              number + " | xargs -I {} rm -- {}")
     with cd("/data/web_static/releases"):
         run("ls -1t | grep web_static_ | tail -n +" +
-            num + " | xargs -I {} rm -rf -- {}")
+            number + " | xargs -I {} rm -rf -- {}")
