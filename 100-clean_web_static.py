@@ -7,7 +7,7 @@ from datetime import datetime
 import tarfile
 
 
-env.hosts = ['52.87.221.123', '52.23.223.26']
+env.hosts = ['50.19.155.99', '3.95.25.61']
 
 
 def do_clean(num=0):
