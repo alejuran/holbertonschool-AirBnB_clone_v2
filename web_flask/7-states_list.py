@@ -10,7 +10,7 @@ from models import storage
 app = Flask(__name__)
 
 
-@app.route('states_list', strict_slashes=False)
+@app.route('/states_list', strict_slashes=False)
 def states_list():
     """
     display a HTML page: (inside the tag BODY)
@@ -20,7 +20,7 @@ def states_list():
 
 
 @app.teardown_appcontext
-def teardown_db(error):
+def teardown_db(exception):
     """
     closes the storage on teardown
     """
